@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="buttonStyle" parent="Widget.AppCompat.Button.Borderless.Colored">
+        <item name="android:colorButtonNormal">#ff1c42</item>
+    </style>
+</resources>
