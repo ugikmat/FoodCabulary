@@ -23,6 +23,11 @@ import android.widget.TextView
 
 import java.util.ArrayList
 import android.Manifest.permission.READ_CONTACTS
+import android.content.Intent
+import android.widget.Toast
+import com.google.android.gms.tasks.OnCompleteListener
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
 
 import kotlinx.android.synthetic.main.activity_register.*
 
@@ -33,22 +38,20 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private var mAuthTask: UserLoginTask? = null
+    private var mAuthTask: UserSignUpTask? = null
+
+    private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_login)
+
+        mAuth = FirebaseAuth.getInstance();
+
         // Set up the login form.
         populateAutoComplete()
-        password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
-            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
-                attemptLogin()
-                return@OnEditorActionListener true
-            }
-            false
-        })
 
-        email_sign_in_button.setOnClickListener { attemptLogin() }
+        email_sign_up_button.setOnClickListener { attemptSignup() }
     }
 
     private fun populateAutoComplete() {
@@ -94,7 +97,7 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * If there are form errors (invalid email, missing fields, etc.), the
      * errors are presented and no actual login attempt is made.
      */
-    private fun attemptLogin() {
+    private fun attemptSignup() {
         if (mAuthTask != null) {
             return
         }
@@ -102,16 +105,18 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         // Reset errors.
         email.error = null
         password.error = null
+        confirm_password.error = null
 
         // Store values at the time of the login attempt.
         val emailStr = email.text.toString()
         val passwordStr = password.text.toString()
+        val rePassword = confirm_password.text.toString()
 
         var cancel = false
         var focusView: View? = null
 
         // Check for a valid password, if the user entered one.
-        if (!TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
+        if (TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
             password.error = getString(R.string.error_invalid_password)
             focusView = password
             cancel = true
@@ -128,6 +133,16 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             cancel = true
         }
 
+        if(TextUtils.isEmpty(rePassword)){
+            confirm_password.error = getString(R.string.error_field_required)
+            focusView = confirm_password
+            cancel = true
+        }else if(!TextUtils.equals(rePassword,passwordStr)){
+            confirm_password.error = getString(R.string.error_password_mismatch)
+            focusView = confirm_password
+            cancel = true
+        }
+
         if (cancel) {
             // There was an error; don't attempt login and focus the first
             // form field with an error.
@@ -136,7 +151,7 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            mAuthTask = UserLoginTask(emailStr, passwordStr)
+            mAuthTask = UserSignUpTask(emailStr, passwordStr)
             mAuthTask!!.execute(null as Void?)
         }
     }
@@ -239,26 +254,26 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
+    inner class UserSignUpTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
 
         override fun doInBackground(vararg params: Void): Boolean? {
             // TODO: attempt authentication against a network service.
 
             try {
-                // Simulate network access.
-                Thread.sleep(2000)
+                mAuth?.createUserWithEmailAndPassword(mEmail, mPassword)
+                        ?.addOnCompleteListener(this@RegisterActivity, {
+                            if(it.isSuccessful){
+                                Toast.makeText(this@RegisterActivity,"Logged In : ${it.result.user.email}", Toast.LENGTH_SHORT).show()
+
+                            }else{
+                                Toast.makeText(this@RegisterActivity,"Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
+                            }
+                        })
             } catch (e: InterruptedException) {
                 return false
             }
 
-            return DUMMY_CREDENTIALS
-                    .map { it.split(":") }
-                    .firstOrNull { it[0] == mEmail }
-                    ?.let {
-                        // Account exists, return true if the password matches.
-                        it[1] == mPassword
-                    }
-                    ?: true
+            return mAuth?.currentUser!=null
         }
 
         override fun onPostExecute(success: Boolean?) {
@@ -266,6 +281,7 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             showProgress(false)
 
             if (success!!) {
+                startActivity(Intent(this@RegisterActivity,HomeActivity::class.java))
                 finish()
             } else {
                 password.error = getString(R.string.error_incorrect_password)

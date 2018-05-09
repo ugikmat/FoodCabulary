@@ -67,6 +67,10 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             false
         })
 
+        text_register.setOnClickListener{
+            startActivity(Intent(this@LoginActivity,RegisterActivity::class.java))
+        }
+
         email_sign_in_button.setOnClickListener { attemptLogin() }
     }
 
@@ -273,25 +277,19 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         override fun doInBackground(vararg params: Void): Boolean? {
             // TODO: attempt authentication against a network service.
 
-            var success = false
-//            var stat:Task<AuthResult>? = null
             try {
                 mAuth?.signInWithEmailAndPassword(mEmail, mPassword)
-                        ?.addOnCompleteListener(this@LoginActivity,OnCompleteListener<AuthResult>(){
-//                            stat = it
+                        ?.addOnCompleteListener(this@LoginActivity,{
                             if(it.isSuccessful){
-                                success=true
-                                Toast.makeText(this@LoginActivity,"Logged In : ${it.result.user.email} ${success}",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@LoginActivity,"Logged In : ${it.result.user.email}",Toast.LENGTH_SHORT).show()
 
                             }else{
-                                success=false
-                                Toast.makeText(this@LoginActivity,"Error: ${it.exception?.message}  ${success}",Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@LoginActivity,"Error: ${it.exception?.message}",Toast.LENGTH_SHORT).show()
                             }
                         })
             } catch (e: InterruptedException) {
                 return false
             }
-
             return mAuth?.currentUser!=null
         }
 

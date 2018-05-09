@@ -4,9 +4,14 @@ import android.content.Intent
 import android.support.v7.app.AppCompatActivity
 import android.os.Bundle
 import com.google.firebase.auth.FirebaseAuth
+import id.filkom.mat.foodcab.model.Dummy
 import kotlinx.android.synthetic.main.activity_home.*
 
-class HomeActivity : AppCompatActivity() {
+class HomeActivity : AppCompatActivity(), CustomAdapter.Listener {
+
+    override fun onItemClick(dummy: Dummy) {
+        TODO("not implemented") //To change body of created functions use File | Settings | File Templates.
+    }
 
     private var mAuth: FirebaseAuth? = null
 
