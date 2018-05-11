@@ -282,7 +282,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                         ?.addOnCompleteListener(this@LoginActivity,{
                             if(it.isSuccessful){
                                 Toast.makeText(this@LoginActivity,"Logged In : ${it.result.user.email}",Toast.LENGTH_SHORT).show()
-
                             }else{
                                 Toast.makeText(this@LoginActivity,"Error: ${it.exception?.message}",Toast.LENGTH_SHORT).show()
                             }
@@ -302,7 +301,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                 startActivity(intent)
                 finish()
             } else {
-                password.error = getString(R.string.error_incorrect_password)
+                password.error = getString(R.string.error_failed)
                 password.requestFocus()
             }
         }

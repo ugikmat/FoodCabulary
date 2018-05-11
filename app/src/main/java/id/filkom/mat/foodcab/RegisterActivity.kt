@@ -28,6 +28,7 @@ import android.widget.Toast
 import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 
 import kotlinx.android.synthetic.main.activity_register.*
 
@@ -42,54 +43,28 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     private var mAuth: FirebaseAuth? = null
 
+    val database = FirebaseDatabase.getInstance()
+    val myRef = database.getReference("users")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
+        setContentView(R.layout.activity_register)
 
         mAuth = FirebaseAuth.getInstance();
 
         // Set up the login form.
-        populateAutoComplete()
+
+        confirm_password.setOnEditorActionListener(TextView.OnEditorActionListener { _, id, _ ->
+            if (id == EditorInfo.IME_ACTION_DONE || id == EditorInfo.IME_NULL) {
+                attemptSignup()
+                return@OnEditorActionListener true
+            }
+            false
+        })
 
         email_sign_up_button.setOnClickListener { attemptSignup() }
     }
 
-    private fun populateAutoComplete() {
-        if (!mayRequestContacts()) {
-            return
-        }
-
-        loaderManager.initLoader(0, null, this)
-    }
-
-    private fun mayRequestContacts(): Boolean {
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.M) {
-            return true
-        }
-        if (checkSelfPermission(READ_CONTACTS) == PackageManager.PERMISSION_GRANTED) {
-            return true
-        }
-        if (shouldShowRequestPermissionRationale(READ_CONTACTS)) {
-            Snackbar.make(email, R.string.permission_rationale, Snackbar.LENGTH_INDEFINITE)
-                    .setAction(android.R.string.ok,
-                            { requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS) })
-        } else {
-            requestPermissions(arrayOf(READ_CONTACTS), REQUEST_READ_CONTACTS)
-        }
-        return false
-    }
-
-    /**
-     * Callback received when a permissions request has been completed.
-     */
-    override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>,
-                                            grantResults: IntArray) {
-        if (requestCode == REQUEST_READ_CONTACTS) {
-            if (grantResults.size == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                populateAutoComplete()
-            }
-        }
-    }
 
 
     /**
@@ -257,9 +232,9 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     inner class UserSignUpTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
 
         override fun doInBackground(vararg params: Void): Boolean? {
-            // TODO: attempt authentication against a network service.
 
             try {
+
                 mAuth?.createUserWithEmailAndPassword(mEmail, mPassword)
                         ?.addOnCompleteListener(this@RegisterActivity, {
                             if(it.isSuccessful){
@@ -270,6 +245,7 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                             }
                         })
             } catch (e: InterruptedException) {
+                Toast.makeText(this@RegisterActivity,"Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 return false
             }
 
@@ -280,11 +256,13 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             mAuthTask = null
             showProgress(false)
 
+            Toast.makeText(this@RegisterActivity,"Status: ${success}", Toast.LENGTH_SHORT).show()
             if (success!!) {
+                myRef.setValue(mAuth?.currentUser)
                 startActivity(Intent(this@RegisterActivity,HomeActivity::class.java))
                 finish()
             } else {
-                password.error = getString(R.string.error_incorrect_password)
+                password.error = getString(R.string.error_failed)
                 password.requestFocus()
             }
         }
@@ -293,19 +271,5 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             mAuthTask = null
             showProgress(false)
         }
-    }
-
-    companion object {
-
-        /**
-         * Id to identity READ_CONTACTS permission request.
-         */
-        private val REQUEST_READ_CONTACTS = 0
-
-        /**
-         * A dummy authentication store containing known user names and passwords.
-         * TODO: remove after connecting to a real authentication system.
-         */
-        private val DUMMY_CREDENTIALS = arrayOf("foo@example.com:hello", "bar@example.com:world")
     }
 }
