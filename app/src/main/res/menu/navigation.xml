@@ -7,12 +7,12 @@
         android:title="Beranda" />
 
     <item
-        android:id="@+id/dashboard"
+        android:id="@+id/kategori"
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="Kategori" />
 
     <item
-        android:id="@+id/food"
+        android:id="@+id/langganan"
         android:icon="@drawable/ic_dashboard_black_24dp"
         android:title="Langgangan" />
 

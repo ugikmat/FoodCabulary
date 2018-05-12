@@ -1,17 +1,26 @@
 package id.filkom.mat.foodcab
 
 import android.content.Context
+import android.content.DialogInterface
 import android.os.Bundle
 import android.support.v4.app.Fragment
+import android.support.v7.app.AlertDialog
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 
 import id.filkom.mat.foodcab.dummy.DummyContent
-import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
+import id.filkom.mat.foodcab.model.*
+import com.firebase.ui.database.FirebaseRecyclerAdapter
+import com.google.firebase.database.*
+import java.text.NumberFormat
+import java.util.*
+
 
 /**
  * A fragment representing a list of Items.
@@ -29,18 +38,23 @@ class HomeFragment : Fragment() {
     private var mColumnCount = 1
     private var mListener: OnListFragmentInteractionListener? = null
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
         if (arguments != null) {
             mColumnCount = arguments!!.getInt(ARG_COLUMN_COUNT)
         }
+        Log.d("create","OnCreate")
+        FoodList.ITEMS.clear()
+        loadMenu()
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_food_list, container, false)
 
+        Log.d("createView","OnCreateView")
         // Set the adapter
         if (view is RecyclerView) {
             val context = view.getContext()
@@ -49,14 +63,46 @@ class HomeFragment : Fragment() {
             } else {
                 view.layoutManager = GridLayoutManager(context, mColumnCount)
             }
-            view.adapter = MyFoodRecyclerViewAdapter(DummyContent.ITEMS, mListener)
+            view.adapter = MyFoodRecyclerViewAdapter(activity?.baseContext,FoodList.ITEMS, mListener)
         }
+
         return view
+    }
+
+    private fun loadMenu() {
+        var database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("food")
+
+        // Read from the database
+        myRef.addChildEventListener(object : ChildEventListener{
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
+                FoodList.ITEMS.add(p0?.getValue(Food::class.java)!!)
+
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot?) {
+
+            }
+
+        })
     }
 
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
+        Log.d("attach","OnAttach")
         if (context is OnListFragmentInteractionListener) {
             mListener = context
         } else {
@@ -65,6 +111,7 @@ class HomeFragment : Fragment() {
     }
 
     override fun onDetach() {
+        Log.d("detach","OnDetach")
         super.onDetach()
         mListener = null
     }
@@ -81,9 +128,9 @@ class HomeFragment : Fragment() {
 
     companion object {
 
-        // TODO: Customize parameter argument names
+        
         private val ARG_COLUMN_COUNT = "column-count"
-
+        val TAG: String = HomeFragment::class.java.simpleName
         // TODO: Customize parameter initialization
         fun newInstance(columnCount: Int): HomeFragment {
             val fragment = HomeFragment()
@@ -94,3 +141,4 @@ class HomeFragment : Fragment() {
         }
     }
 }
+

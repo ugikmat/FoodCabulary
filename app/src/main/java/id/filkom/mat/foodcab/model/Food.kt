@@ -1,8 +1,11 @@
 package id.filkom.mat.foodcab.model
 
+import java.util.ArrayList
+
 /**
  * Created by mat on 5/9/18.
  */
+
 class Food {
     companion object Factory {
         fun create(): Food = Food()

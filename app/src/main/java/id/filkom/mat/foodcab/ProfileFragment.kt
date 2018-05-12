@@ -76,6 +76,8 @@ class ProfileFragment : Fragment() {
         private val ARG_PARAM1 = "param1"
         private val ARG_PARAM2 = "param2"
 
+        val TAG: String = ProfileFragment::class.java.simpleName
+
         /**
          * Use this factory method to create a new instance of
          * this fragment using the provided parameters.
@@ -85,11 +87,9 @@ class ProfileFragment : Fragment() {
          * @return A new instance of fragment ProfileFragment.
          */
         // TODO: Rename and change types and number of parameters
-        fun newInstance(param1: String, param2: String): ProfileFragment {
+        fun newInstance(): ProfileFragment {
             val fragment = ProfileFragment()
             val args = Bundle()
-            args.putString(ARG_PARAM1, param1)
-            args.putString(ARG_PARAM2, param2)
             fragment.arguments = args
             return fragment
         }

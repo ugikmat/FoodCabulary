@@ -35,10 +35,13 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
     private var mDatabaseRef: DatabaseReference? = null
 
     var saveUri: Uri? = null
+    private lateinit var newFood:Food
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_add)
+
+        newFood = Food.create()
 
         mStorageRef = FirebaseStorage.getInstance().getReference();
         mDatabaseRef = FirebaseDatabase.getInstance().getReference("food")
@@ -50,42 +53,22 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onClick(v: View?) {
 
-        var food= Food.create()
-
-        food.name = name.text.toString()
-        food.location = location.text.toString()
-
+        newFood.name = name.text.toString()
+        newFood.location = location.text.toString()
 
         var id: Int = radio_group.checkedRadioButtonId
 
         if (id!=-1){ // If any radio button checked from radio group
             // Get the instance of radio button using id
             val radio:RadioButton = findViewById(id)
-            food.category = radio.text.toString()
+            newFood.category = radio.text.toString()
         }else{
-            food.category = "Lainnya"
+            newFood.category = "Lainnya"
             // If no radio button checked in this radio group
         }
-        food.phone = phone.text.toString()
-        food.seller = seller.text.toString()
+        newFood.phone = phone.text.toString()
+        newFood.seller = seller.text.toString()
 
-        var imageString = uploadImage()
-
-        food.image = imageString
-
-        mDatabaseRef?.setValue(food)
-                ?.addOnSuccessListener {
-                    Toast.makeText(this,"Succes",Toast.LENGTH_SHORT).show()
-                    startActivity(Intent(this,HomeActivity::class.java))
-                    this@AddActivity.finish()
-                }
-                ?.addOnFailureListener{
-                    Toast.makeText(this,"Failed",Toast.LENGTH_SHORT).show()
-                }
-    }
-
-    fun uploadImage():String{
-        var uri=""
         if(saveUri!=null){
             val imageName:String = UUID.randomUUID().toString()
             val imageFolder:StorageReference? = mStorageRef?.child("image/" + imageName)
@@ -95,8 +78,19 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
                         // Get a URL to the uploaded content
                         val downloadUrl = taskSnapshot.downloadUrl
                         imageFolder?.downloadUrl.addOnSuccessListener {
-                            uri=it.toString()
+                            newFood.image=it.toString()
+                            mDatabaseRef?.push()?.setValue(newFood)
+                                    ?.addOnSuccessListener {
+                                        Toast.makeText(this,"Succes",Toast.LENGTH_SHORT).show()
+                                        startActivity(Intent(this,HomeActivity::class.java))
+                                        this@AddActivity.finish()
+                                    }
+                                    ?.addOnFailureListener{
+                                        Toast.makeText(this,"Failed",Toast.LENGTH_SHORT).show()
+                                    }
+
                         }
+
                     })
                     ?.addOnFailureListener(OnFailureListener {
                         // Handle unsuccessful uploads
@@ -107,7 +101,34 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
                     }
 
         }
-        return uri
+
+
+    }
+
+    fun uploadImage(){
+        if(saveUri!=null){
+            val imageName:String = UUID.randomUUID().toString()
+            val imageFolder:StorageReference? = mStorageRef?.child("image/" + imageName)
+
+            imageFolder?.putFile(saveUri!!)
+                    ?.addOnSuccessListener({ taskSnapshot ->
+                        // Get a URL to the uploaded content
+                        val downloadUrl = taskSnapshot.downloadUrl
+                        imageFolder?.downloadUrl.addOnSuccessListener {
+                            newFood.image=it.toString()
+
+                        }
+
+                    })
+                    ?.addOnFailureListener(OnFailureListener {
+                        // Handle unsuccessful uploads
+                        // ...
+                    })
+                    ?.addOnProgressListener {
+
+                    }
+
+        }
     }
 
 
@@ -142,8 +163,14 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        if(requestCode == REQUEST_SELECT_IMAGE_IN_ALBUM
-                && requestCode == Activity.RESULT_OK
+        Toast.makeText(this,"Foto Dipilih " +
+                "${requestCode == PICK_IMAGE_REQUEST}" +
+                " ${resultCode == Activity.RESULT_OK}" +
+                "${data !=null}" +
+                "${data?.data != null}", Toast.LENGTH_SHORT).show()
+
+        if(requestCode == PICK_IMAGE_REQUEST
+                && resultCode == Activity.RESULT_OK
                 && data !=null && data.data != null){
             saveUri = data.data
             Toast.makeText(this,"Foto Dipilih", Toast.LENGTH_SHORT).show()

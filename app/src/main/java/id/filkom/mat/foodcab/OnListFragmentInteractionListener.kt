@@ -2,11 +2,12 @@ package id.filkom.mat.foodcab
 
 import android.net.Uri
 import id.filkom.mat.foodcab.dummy.DummyContent
+import id.filkom.mat.foodcab.model.Food
 
 /**
  * Created by mat on 5/10/18.
  */
 interface OnListFragmentInteractionListener {
-    fun onListFragmentInteraction(item: DummyContent.DummyItem)
+    fun onListFragmentInteraction(item: Food)
     fun onFragmentInteraction(uri: Uri)
 }

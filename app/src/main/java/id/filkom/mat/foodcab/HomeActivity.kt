@@ -18,16 +18,19 @@ import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.ValueEventListener
 import id.filkom.mat.foodcab.dummy.DummyContent
-import id.filkom.mat.foodcab.extension.enableShiftMode
+import id.filkom.mat.foodcab.extension.*
 import id.filkom.mat.foodcab.model.Food
 import android.view.ViewGroup
 import android.widget.Button
 import com.crashlytics.android.Crashlytics
-
-
+import id.filkom.mat.foodcab.helper.*
 
 
 class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, BottomNavigationView.OnNavigationItemSelectedListener {
+
+    private val KEY_POSITION = "keyPosition"
+
+    private var navPosition: BottomNavigationPosition = BottomNavigationPosition.HOME
 
     private var mAuth: FirebaseAuth? = null
 
@@ -37,6 +40,7 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        restoreSaveInstanceState(savedInstanceState)
         setContentView(R.layout.activity_home)
 
         initBottomNavigation()
@@ -47,85 +51,83 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
             startActivity(Intent(this,AddActivity::class.java))
         }
 
-        var fragment = HomeFragment()
-
-        addFragment(fragment,R.id.fragment_container)
+        initBottomNavigation()
+        initFragment(savedInstanceState)
 
     }
 
-    inline fun FragmentManager.inTransaction(func: FragmentTransaction.() -> FragmentTransaction)
-    {
-        beginTransaction().func().commit()
-    }
-
-    fun AppCompatActivity.addFragment(fragment: Fragment, frameId: Int){
-        supportFragmentManager.inTransaction { add(frameId, fragment)
-        }
-    }
 
     override fun onBackPressed() {
+        super.onBackPressed()
+        finish()
+    }
 
-        val count = fragmentManager.backStackEntryCount
-
-        Toast.makeText(this,count.toString(),Toast.LENGTH_SHORT).show()
-        if (count == 0) {
-            super.onBackPressed()
-            //additional code
-        } else {
-            fragmentManager.popBackStack()
+    private fun restoreSaveInstanceState(savedInstanceState: Bundle?) {
+        // Restore the current navigation position.
+        savedInstanceState?.also {
+            val id = it.getInt(KEY_POSITION, BottomNavigationPosition.HOME.id)
+            navPosition = findNavigationPositionById(id)
         }
-
     }
-
-    fun AppCompatActivity.replaceFragment(fragment: Fragment, frameId: Int) {
-        supportFragmentManager.inTransaction{
-            replace(frameId, fragment) }
-    }
-
 
     private fun initBottomNavigation() {
         bottom_navigation.enableShiftMode()
+        bottom_navigation.active(navPosition.position)   // Extension function
         bottom_navigation.setOnNavigationItemSelectedListener(this)
     }
 
-    fun initDatabase(){
-        myRef.addValueEventListener(object : ValueEventListener {
-            override fun onDataChange(dataSnapshot: DataSnapshot) {
-                // This method is called once with the initial value and again
-                // whenever data at this location is updated.
-                val value = dataSnapshot.getValue(String::class.java)
+    private fun initFragment(savedInstanceState: Bundle?) {
+        savedInstanceState ?: switchFragment(BottomNavigationPosition.HOME)
+    }
 
-            }
-
-            override fun onCancelled(error: DatabaseError) {
-                // Failed to read value
-
-            }
-        })
+    override fun onSaveInstanceState(outState: Bundle?) {
+        // Store the current navigation position.
+        outState?.putInt(KEY_POSITION, navPosition.id)
+        super.onSaveInstanceState(outState)
     }
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
-        when(item.title){
-            "Beranda" -> replaceFragment(HomeFragment(),R.id.fragment_container)
-            "Kategori" -> replaceFragment(HomeFragment(),R.id.fragment_container)
-            "Langgangan" -> replaceFragment(HomeFragment(),R.id.fragment_container)
-            "Profile" -> replaceFragment(ProfileFragment(),R.id.fragment_container)
-        }
+        navPosition = findNavigationPositionById(item.itemId)
+        return switchFragment(navPosition)
+    }
+
+    private fun switchFragment(navPosition: BottomNavigationPosition): Boolean {
+        val fragment = supportFragmentManager.findFragment(navPosition)
+        if (fragment.isAdded) return false
+        detachFragment()
+        attachFragment(fragment, navPosition.getTag())
+        supportFragmentManager.executePendingTransactions()
         return true
     }
 
-    override fun onListFragmentInteraction(item: DummyContent.DummyItem) {
+    private fun detachFragment() {
+        supportFragmentManager.findFragmentById(R.id.container)?.also {
+            supportFragmentManager.beginTransaction().detach(it).commit()
+        }
+    }
 
+    private fun attachFragment(fragment: Fragment, tag: String) {
+        if (fragment.isDetached) {
+            supportFragmentManager.beginTransaction().attach(fragment).commit()
+        } else {
+            supportFragmentManager.beginTransaction().add(R.id.container, fragment, tag).commit()
+        }
+        // Set a transition animation for this transaction.
+        supportFragmentManager.beginTransaction()
+                .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE)
+                .commit()
+    }
+
+    private fun FragmentManager.findFragment(position: BottomNavigationPosition): Fragment {
+        return findFragmentByTag(position.getTag()) ?: position.createFragment()
+    }
+
+
+    override fun onListFragmentInteraction(item: Food) {
+        Toast.makeText(this,"Clicked ${item.name}",Toast.LENGTH_SHORT ).show()
     }
 
     override fun onFragmentInteraction(uri: Uri) {
-
-    }
-
-    public override fun onStart() {
-        super.onStart()
-        // Check if user is signed in (non-null) and update UI accordingly.
-        val currentUser = mAuth?.getCurrentUser()
 
     }
 }
