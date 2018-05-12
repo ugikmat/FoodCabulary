@@ -50,6 +50,7 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        Log.d("INFOOOOOOOOOOOOO","OnCreate")
         setContentView(R.layout.activity_login)
         // Set up the login form.
         mAuth = FirebaseAuth.getInstance();
@@ -72,15 +73,18 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
         }
 
         email_sign_in_button.setOnClickListener { attemptLogin() }
+
     }
 
     public override fun onStart() {
         super.onStart()
+        Log.d("INFOOOOOOOOOOOOO","OnStart")
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth?.getCurrentUser()
 
         if(currentUser!=null){
             startActivity(Intent(this@LoginActivity,HomeActivity::class.java))
+            finish()
         }
     }
 

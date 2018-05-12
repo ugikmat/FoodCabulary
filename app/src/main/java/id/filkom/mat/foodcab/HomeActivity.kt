@@ -8,21 +8,14 @@ import android.support.design.widget.BottomNavigationView
 import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
+import android.util.Log
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
-import com.google.firebase.auth.FirebaseAuth
 import kotlinx.android.synthetic.main.activity_home.*
-import com.google.firebase.database.FirebaseDatabase
-import com.google.firebase.database.DatabaseError
-import com.google.firebase.database.DataSnapshot
-import com.google.firebase.database.ValueEventListener
 import id.filkom.mat.foodcab.dummy.DummyContent
 import id.filkom.mat.foodcab.extension.*
 import id.filkom.mat.foodcab.model.Food
-import android.view.ViewGroup
-import android.widget.Button
-import com.crashlytics.android.Crashlytics
 import id.filkom.mat.foodcab.helper.*
 
 
@@ -35,10 +28,6 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
     private var navPosition: BottomNavigationPosition = BottomNavigationPosition.HOME
 
-    private var mAuth: FirebaseAuth? = null
-
-    val database = FirebaseDatabase.getInstance()
-    val myRef = database.reference
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -48,15 +37,12 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
         initBottomNavigation()
 
-        mAuth = FirebaseAuth.getInstance();
-
         fab_add.setOnClickListener {
             startActivity(Intent(this,AddActivity::class.java))
         }
 
         initBottomNavigation()
         initFragment(savedInstanceState)
-
     }
 
     private fun restoreSaveInstanceState(savedInstanceState: Bundle?) {
