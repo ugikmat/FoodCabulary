@@ -9,6 +9,7 @@ import android.support.v4.app.Fragment
 import android.support.v4.app.FragmentManager
 import android.support.v4.app.FragmentTransaction
 import android.util.Log
+import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Toast
@@ -17,6 +18,12 @@ import id.filkom.mat.foodcab.dummy.DummyContent
 import id.filkom.mat.foodcab.extension.*
 import id.filkom.mat.foodcab.model.Food
 import id.filkom.mat.foodcab.helper.*
+import android.view.MenuInflater
+import android.support.v4.view.MenuItemCompat.getActionView
+import android.content.Context.SEARCH_SERVICE
+import android.app.SearchManager
+import android.content.Context
+import android.widget.SearchView
 
 
 class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -112,5 +119,18 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
     override fun onFragmentInteraction(uri: Uri) {
 
+    }
+
+    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+        val inflater = menuInflater
+        inflater.inflate(R.menu.options_menu, menu)
+
+        // Associate searchable configuration with the SearchView
+        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+        val searchView = menu.findItem(R.id.search).actionView as SearchView
+        searchView.setSearchableInfo(
+                searchManager.getSearchableInfo(componentName))
+
+        return true
     }
 }
