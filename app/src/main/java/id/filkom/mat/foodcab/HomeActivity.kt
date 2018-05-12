@@ -27,6 +27,9 @@ import id.filkom.mat.foodcab.helper.*
 
 
 class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, BottomNavigationView.OnNavigationItemSelectedListener {
+    override fun onListFragmentInteraction(item: DummyContent.DummyItem) {
+
+    }
 
     private val KEY_POSITION = "keyPosition"
 
@@ -54,12 +57,6 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
         initBottomNavigation()
         initFragment(savedInstanceState)
 
-    }
-
-
-    override fun onBackPressed() {
-        super.onBackPressed()
-        finish()
     }
 
     private fun restoreSaveInstanceState(savedInstanceState: Bundle?) {
