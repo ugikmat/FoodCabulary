@@ -10,8 +10,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 
-import id.filkom.mat.foodcab.dummy.DummyContent
-import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
+import id.filkom.mat.foodcab.model.FoodList
+
+import kotlinx.android.synthetic.main.fragment_kategori_list.*
 
 /**
  * A fragment representing a list of Items.
@@ -25,8 +26,7 @@ import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
  * fragment (e.g. upon screen orientation changes).
  */
 class KategoriFragment : Fragment() {
-    // TODO: Customize parameters
-    private var mColumnCount = 2
+    private var mColumnCount = 3
     private var mListener: OnListFragmentInteractionListener? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,20 +38,33 @@ class KategoriFragment : Fragment() {
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_kategori_list, container, false)
 
-        // Set the adapter
-        if (view is RecyclerView) {
-            val context = view.getContext()
-            val recyclerView = view as RecyclerView
-            if (mColumnCount <= 1) {
-                recyclerView.layoutManager = LinearLayoutManager(context)
-            } else {
-                recyclerView.layoutManager = GridLayoutManager(context, mColumnCount)
-            }
-            recyclerView.adapter = MykategoriRecyclerViewAdapter(DummyContent.ITEMS, mListener)
-        }
+//        // Set the adapter
+//        if (view is RecyclerView) {
+//            val context = view.getContext()
+//            val recyclerView = view as RecyclerView
+//            if (mColumnCount <= 1) {
+//                recyclerView.layoutManager = LinearLayoutManager(context)
+//            } else {
+//                recyclerView.layoutManager = GridLayoutManager(context, mColumnCount)
+//            }
+//            recyclerView.adapter = MykategoriRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS, mListener)
+//        }
+//
         return view
     }
 
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+
+        recycler_top.layoutManager = LinearLayoutManager(recycler_top.context)
+        recycler_top.adapter = MykategoriRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS_TOP, mListener)
+
+        recycler_kat.layoutManager = GridLayoutManager(recycler_kat.context,mColumnCount)
+        recycler_kat.adapter = MyFoodSortRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS, mListener)
+
+        recycler_list.layoutManager = LinearLayoutManager(recycler_list.context)
+        recycler_list.adapter = MykategoriRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS_TOP, mListener)
+    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)

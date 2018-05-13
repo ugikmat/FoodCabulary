@@ -8,20 +8,17 @@ import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
 import com.squareup.picasso.Picasso
-
-import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
 import id.filkom.mat.foodcab.model.Kategori
 
 /**
- * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
- * specified [OnListFragmentInteractionListener].
- * TODO: Replace the implementation with code for your data type.
+ * Created by mat on 5/13/18.
  */
-class MykategoriRecyclerViewAdapter(private val context: Context?, private val mValues: List<Kategori>, private val mListener: OnListFragmentInteractionListener?) : RecyclerView.Adapter<MykategoriRecyclerViewAdapter.ViewHolder>() {
+class MyFoodSortRecyclerViewAdapter(private val context: Context?, private val mValues: List<Kategori>, private val mListener: OnListFragmentInteractionListener?) : RecyclerView.Adapter<MyFoodSortRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
-                .inflate(R.layout.menu_kategori, parent, false)
+                .inflate(R.layout.fragment_kategori, parent, false)
+
         return ViewHolder(view)
     }
 

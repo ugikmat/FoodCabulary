@@ -23,10 +23,16 @@ import android.support.v4.view.MenuItemCompat.getActionView
 import android.content.Context.SEARCH_SERVICE
 import android.app.SearchManager
 import android.content.Context
+import android.support.v7.widget.Toolbar
 import android.widget.SearchView
+import id.filkom.mat.foodcab.model.Kategori
 
 
 class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, BottomNavigationView.OnNavigationItemSelectedListener {
+    override fun onListFragmentInteraction(item: Kategori) {
+
+    }
+
     override fun onListFragmentInteraction(item: DummyContent.DummyItem) {
 
     }
@@ -35,13 +41,14 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
     private var navPosition: BottomNavigationPosition = BottomNavigationPosition.HOME
 
-
+    private lateinit var toolbar: Toolbar
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         restoreSaveInstanceState(savedInstanceState)
         setContentView(R.layout.activity_home)
-
+        toolbar = findViewById(R.id.toolbar)
+        setSupportActionBar(toolbar)
         initBottomNavigation()
 
         fab_add.setOnClickListener {
