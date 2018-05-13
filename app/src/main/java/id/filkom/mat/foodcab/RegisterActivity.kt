@@ -29,6 +29,8 @@ import com.google.android.gms.tasks.OnCompleteListener
 import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import id.filkom.mat.foodcab.model.User
+import id.filkom.mat.foodcab.model.Users
 
 import kotlinx.android.synthetic.main.activity_register.*
 
@@ -39,7 +41,7 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private var mAuthTask: UserSignUpTask? = null
+//    private var mAuthTask: UserSignUpTask? = null
 
     private var mAuth: FirebaseAuth? = null
 
@@ -73,22 +75,32 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * errors are presented and no actual login attempt is made.
      */
     private fun attemptSignup() {
-        if (mAuthTask != null) {
-            return
-        }
 
         // Reset errors.
         email.error = null
+        uname.error = null
         password.error = null
         confirm_password.error = null
 
-        // Store values at the time of the login attempt.
+        // Store values at the time of the register attempt.
         val emailStr = email.text.toString()
+        val unameStr = uname.text.toString()
         val passwordStr = password.text.toString()
         val rePassword = confirm_password.text.toString()
 
         var cancel = false
         var focusView: View? = null
+
+        // Check username
+        if(unameStr.length<4){
+            uname.error = "Username terlalu pendek"
+            focusView = uname
+            cancel = true
+        }else if(unameStr.length>10){
+            uname.error = "Username terlalu panjang"
+            focusView = uname
+            cancel = true
+        }
 
         // Check for a valid password, if the user entered one.
         if (TextUtils.isEmpty(passwordStr) && !isPasswordValid(passwordStr)) {
@@ -126,8 +138,22 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            mAuthTask = UserSignUpTask(emailStr, passwordStr)
-            mAuthTask!!.execute(null as Void?)
+
+            mAuth?.createUserWithEmailAndPassword(emailStr, passwordStr)
+                    ?.addOnCompleteListener(this@RegisterActivity, {
+                        if(it.isSuccessful){
+                            Toast.makeText(this@RegisterActivity,"Sign Up Success : ${it.result.user.email}", Toast.LENGTH_SHORT).show()
+                            Users.user?.name =unameStr
+                            myRef.child(mAuth?.uid).setValue(Users.user)
+                            startActivity(Intent(this@RegisterActivity,HomeActivity::class.java))
+                            finish()
+                        }else{
+                            Toast.makeText(this@RegisterActivity,"Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
+                            password.error = getString(R.string.error_failed)
+                            password.requestFocus()
+                        }
+                        showProgress(false)
+                    })
         }
     }
 
@@ -229,47 +255,47 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    inner class UserSignUpTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
-
-        override fun doInBackground(vararg params: Void): Boolean? {
-
-            try {
-
-                mAuth?.createUserWithEmailAndPassword(mEmail, mPassword)
-                        ?.addOnCompleteListener(this@RegisterActivity, {
-                            if(it.isSuccessful){
-                                Toast.makeText(this@RegisterActivity,"Logged In : ${it.result.user.email}", Toast.LENGTH_SHORT).show()
-
-                            }else{
-                                Toast.makeText(this@RegisterActivity,"Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
-                            }
-                        })
-            } catch (e: InterruptedException) {
-                Toast.makeText(this@RegisterActivity,"Error: ${e.message}", Toast.LENGTH_SHORT).show()
-                return false
-            }
-
-            return mAuth?.currentUser!=null
-        }
-
-        override fun onPostExecute(success: Boolean?) {
-            mAuthTask = null
-            showProgress(false)
-
-            Toast.makeText(this@RegisterActivity,"Status: ${success}", Toast.LENGTH_SHORT).show()
-            if (success!!) {
-                myRef.setValue(mAuth?.currentUser)
-                startActivity(Intent(this@RegisterActivity,HomeActivity::class.java))
-                finish()
-            } else {
-                password.error = getString(R.string.error_failed)
-                password.requestFocus()
-            }
-        }
-
-        override fun onCancelled() {
-            mAuthTask = null
-            showProgress(false)
-        }
-    }
+//    inner class UserSignUpTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
+//
+//        override fun doInBackground(vararg params: Void): Boolean? {
+//
+//            try {
+//
+//                mAuth?.createUserWithEmailAndPassword(mEmail, mPassword)
+//                        ?.addOnCompleteListener(this@RegisterActivity, {
+//                            if(it.isSuccessful){
+//                                Toast.makeText(this@RegisterActivity,"Logged In : ${it.result.user.email}", Toast.LENGTH_SHORT).show()
+//
+//                            }else{
+//                                Toast.makeText(this@RegisterActivity,"Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
+//                            }
+//                        })
+//            } catch (e: InterruptedException) {
+//                Toast.makeText(this@RegisterActivity,"Error: ${e.message}", Toast.LENGTH_SHORT).show()
+//                return false
+//            }
+//
+//            return mAuth?.currentUser!=null
+//        }
+//
+//        override fun onPostExecute(success: Boolean?) {
+//            mAuthTask = null
+//            showProgress(false)
+//
+//            Toast.makeText(this@RegisterActivity,"Status: ${success}", Toast.LENGTH_SHORT).show()
+//            if (success!!) {
+//                myRef.setValue(mAuth?.currentUser)
+//                startActivity(Intent(this@RegisterActivity,HomeActivity::class.java))
+//                finish()
+//            } else {
+//                password.error = getString(R.string.error_failed)
+//                password.requestFocus()
+//            }
+//        }
+//
+//        override fun onCancelled() {
+//            mAuthTask = null
+//            showProgress(false)
+//        }
+//    }
 }

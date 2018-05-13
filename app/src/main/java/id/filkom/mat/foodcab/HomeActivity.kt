@@ -121,6 +121,7 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
 
     override fun onListFragmentInteraction(item: Food) {
+        Log.d("INFOOOOOOOOO","Clicked")
         Toast.makeText(this,"Clicked ${item.name}",Toast.LENGTH_SHORT ).show()
     }
 

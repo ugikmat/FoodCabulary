@@ -9,6 +9,11 @@ import android.support.v7.widget.RecyclerView
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
 
 import id.filkom.mat.foodcab.dummy.DummyContent
 import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
@@ -29,8 +34,11 @@ class LanggananFragment : Fragment() {
     private var mColumnCount = 2
     private var mListener: OnListFragmentInteractionListener? = null
 
+    private var mAuth: FirebaseAuth? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        mAuth = FirebaseAuth.getInstance();
 
     }
 
@@ -52,6 +60,34 @@ class LanggananFragment : Fragment() {
         return view
     }
 
+    private fun loadMenu() {
+        var database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("users/"+mAuth?.currentUser?.uid+"/fav")
+
+        // Read from the database
+        myRef.addChildEventListener(object : ChildEventListener {
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot?) {
+
+            }
+
+        })
+    }
 
     override fun onAttach(context: Context?) {
         super.onAttach(context)
@@ -77,13 +113,8 @@ class LanggananFragment : Fragment() {
      * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
      */
     companion object {
-
-        // TODO: Customize parameter argument names
-        private val ARG_COLUMN_COUNT = "column-count"
-
         val TAG: String = LanggananFragment::class.java.simpleName
 
-        // TODO: Customize parameter initialization
         fun newInstance() = LanggananFragment()
     }
 }

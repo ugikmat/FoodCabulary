@@ -1,12 +1,16 @@
 package id.filkom.mat.foodcab
 
 import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import kotlinx.android.synthetic.main.fragment_profile.*
 
 
 /**
@@ -21,21 +25,29 @@ class ProfileFragment : Fragment() {
 
     private var mListener: OnListFragmentInteractionListener? = null
 
+    private var mAuth: FirebaseAuth? = null
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_profile, container, false)
     }
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     *
-     *
-     * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
-     */
+
+    override fun onStart() {
+        super.onStart()
+        mAuth = FirebaseAuth.getInstance();
+    }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        text_email.text = mAuth?.currentUser?.email
+        text_uid.text = mAuth?.currentUser?.uid
+        btn_logout.setOnClickListener {
+            mAuth?.signOut()
+            activity?.startActivity(Intent(activity,LoginActivity::class.java))
+            activity?.finish()
+        }
+    }
 
     companion object {
 
