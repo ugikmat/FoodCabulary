@@ -65,9 +65,6 @@ dependencies {
     androidTestImplementation('com.android.support.test.espresso:espresso-intents:3.0.2', {
         exclude group: 'com.android.support', module: 'support-annotations'
     })
-    androidTestImplementation("com.android.support.test.uiautomator:uiautomator-v18:2.1.1", {
-        exclude group: "com.android.support", module: "support-annotations"
-    })
 }
 
 

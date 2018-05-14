@@ -4,7 +4,9 @@ package id.filkom.mat.foodcab
 import android.support.test.espresso.Espresso.onView
 import android.support.test.espresso.action.ViewActions.click
 import android.support.test.espresso.action.ViewActions.typeText
-import android.support.test.espresso.matcher.ViewMatchers.withId
+import android.support.test.espresso.assertion.ViewAssertions.matches
+import android.support.test.espresso.matcher.ViewMatchers.*
+import android.support.test.rule.ActivityTestRule
 import android.support.test.runner.AndroidJUnit4
 import com.squareup.javawriter.JavaWriter.type
 import org.junit.Rule
@@ -18,16 +20,32 @@ import org.junit.runner.RunWith
 class EmailNotValid {
 
 
+    @get: Rule
+    var mActivityTestRule = ActivityTestRule(LoginActivity::class.java)
 
     @Test
-    fun emailNotValid(){
-        onView(withId(R.id.email))        // withId(R.id.my_view) is a ViewMatcher
-        .perform(typeText("Hello"), click());
+    fun invalidEmail() {
+        //to check view on screen
+        onView(withId(R.id.email)).perform(typeText("Halo Semuanya"))
+        onView(withId(R.id.password)).perform(typeText("Halo emuanya"))
+        onView(withId(R.id.email_sign_in_button)).perform(click())
+        try {
+            Thread.sleep(5000)
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
 
-        onView(withId(R.id.password))        // withId(R.id.my_view) is a ViewMatcher
-                .perform(typeText("Hello"), click());
-        onView(withId(R.id.email_sign_in_button))        // withId(R.id.my_view) is a ViewMatcher
-                .perform(click());
     }
 
+    fun emptyEmail() {
+        //to check view on screen
+        onView(withId(R.id.password)).perform(typeText("Halo emuanya"))
+        onView(withId(R.id.email_sign_in_button)).perform(click())
+        try {
+            Thread.sleep(5000)
+        } catch (e: InterruptedException) {
+            e.printStackTrace()
+        }
+
+    }
 }
