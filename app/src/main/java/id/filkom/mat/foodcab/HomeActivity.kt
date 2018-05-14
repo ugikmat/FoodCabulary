@@ -16,7 +16,6 @@ import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_home.*
 import id.filkom.mat.foodcab.dummy.DummyContent
 import id.filkom.mat.foodcab.extension.*
-import id.filkom.mat.foodcab.model.Food
 import id.filkom.mat.foodcab.helper.*
 import android.view.MenuInflater
 import android.support.v4.view.MenuItemCompat.getActionView
@@ -27,9 +26,7 @@ import android.support.v7.widget.Toolbar
 import android.widget.SearchView
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
-import id.filkom.mat.foodcab.model.Kategori
-import id.filkom.mat.foodcab.model.User
-import id.filkom.mat.foodcab.model.Users
+import id.filkom.mat.foodcab.model.*
 
 
 class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, BottomNavigationView.OnNavigationItemSelectedListener {
@@ -132,19 +129,26 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
     }
 
 
-    override fun onListFragmentInteraction(item: Food) {
-        if(!Users.user?.fav?.isEmpty()!!){
-            Users.user.fav.forEach {
-                if(it.name?.equals(item?.name,true)!!
-                        &&it.seller?.equals(item?.seller,true)!!){
-                    Toast.makeText(this,"Already Added",Toast.LENGTH_SHORT ).show()
-                    return
-                }
-            }
+    override fun onListFragmentInteraction(index: Int) {
+
+
+        val intent = Intent(this, FoodDetailActivity::class.java).apply {
+            putExtra(FoodDetailFragment.ARG_ITEM_ID, index)
         }
-        Users.user.fav.add(item)
-        myRef.child(mAuth?.uid).setValue(Users.user)
-        Toast.makeText(this,"Added to Fav",Toast.LENGTH_SHORT ).show()
+        startActivity(intent)
+
+//        if(!Users.user?.fav?.isEmpty()!!){
+//            Users.user.fav.forEach {
+//                if(it.name?.equals(item?.name,true)!!
+//                        &&it.seller?.equals(item?.seller,true)!!){
+//                    Toast.makeText(this,"Already Added",Toast.LENGTH_SHORT ).show()
+//                    return
+//                }
+//            }
+//        }
+//        Users.user.fav.add(item)
+//        myRef.child(mAuth?.uid).setValue(Users.user)
+//        Toast.makeText(this,"Added to Fav",Toast.LENGTH_SHORT ).show()
     }
 
     override fun onFragmentInteraction(uri: Uri) {

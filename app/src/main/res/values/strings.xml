@@ -24,4 +24,7 @@
 
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_food_list">Foods</string>
+    <string name="title_food_detail">Food Detail</string>
+    <string name="title_activity_maps">Map</string>
 </resources>

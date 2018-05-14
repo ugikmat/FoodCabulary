@@ -47,6 +47,13 @@ class ProfileFragment : Fragment() {
             activity?.startActivity(Intent(activity,LoginActivity::class.java))
             activity?.finish()
         }
+
+        btn_test_detail.setOnClickListener {
+
+            activity?.startActivity(Intent(activity,MapsActivity::class.java))
+
+        }
+
     }
 
     companion object {

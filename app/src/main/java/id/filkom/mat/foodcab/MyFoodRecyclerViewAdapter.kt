@@ -37,7 +37,7 @@ class MyFoodRecyclerViewAdapter(private val context:Context?,private val mValues
         Picasso.with(context).load(mValues[position].image)
                 .into(holder.mImage)
         holder.mView.setOnClickListener {
-            mListener?.onListFragmentInteraction(holder.mItem!!)
+            mListener?.onListFragmentInteraction(position)
         }
     }
 

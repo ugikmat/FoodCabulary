@@ -18,6 +18,7 @@ import id.filkom.mat.foodcab.dummy.DummyContent
 import id.filkom.mat.foodcab.model.*
 import com.firebase.ui.database.FirebaseRecyclerAdapter
 import com.google.firebase.database.*
+import kotlinx.android.synthetic.main.fragment_food_list.*
 import java.text.NumberFormat
 import java.util.*
 
@@ -82,6 +83,8 @@ class HomeFragment : Fragment() {
 
             override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
                 FoodList.ITEMS.add(p0?.getValue(Food::class.java)!!)
+                FoodList.ITEM_MAP.put(FoodList.ITEMS.size-1,p0?.getValue(Food::class.java)!!)
+                list.adapter.notifyItemInserted(FoodList.ITEMS.size-1)
 
             }
 
