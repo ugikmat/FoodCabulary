@@ -6,6 +6,7 @@ import android.support.v4.app.Fragment
 import android.support.v7.widget.GridLayoutManager
 import android.support.v7.widget.LinearLayoutManager
 import android.support.v7.widget.RecyclerView
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -15,8 +16,11 @@ import com.google.firebase.database.DataSnapshot
 import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 
+import id.filkom.mat.foodcab.model.FoodList
+import id.filkom.mat.foodcab.model.Food
 import id.filkom.mat.foodcab.dummy.DummyContent
 import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
+import kotlinx.android.synthetic.main.fragment_langganan_list.*
 
 /**
  * A fragment representing a list of Items.
@@ -30,15 +34,16 @@ import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
  * fragment (e.g. upon screen orientation changes).
  */
 class LanggananFragment : Fragment() {
-    // TODO: Customize parameters
-    private var mColumnCount = 2
+    private var mColumnCount = 1
     private var mListener: OnListFragmentInteractionListener? = null
 
     private var mAuth: FirebaseAuth? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        FoodList.ITEMS_FAV.clear()
         mAuth = FirebaseAuth.getInstance();
+        loadMenu()
 
     }
 
@@ -55,7 +60,7 @@ class LanggananFragment : Fragment() {
             } else {
                 recyclerView.layoutManager = GridLayoutManager(context, mColumnCount)
             }
-            recyclerView.adapter = MyLanggananRecyclerViewAdapter(DummyContent.ITEMS, mListener)
+            recyclerView.adapter = MyFoodRecyclerViewAdapter(activity?.baseContext,FoodList.ITEMS_FAV, mListener)
         }
         return view
     }
@@ -79,7 +84,7 @@ class LanggananFragment : Fragment() {
             }
 
             override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
-
+                FoodList.ITEMS_FAV.add(p0?.getValue(Food::class.java)!!)
             }
 
             override fun onChildRemoved(p0: DataSnapshot?) {
@@ -87,6 +92,7 @@ class LanggananFragment : Fragment() {
             }
 
         })
+
     }
 
     override fun onAttach(context: Context?) {

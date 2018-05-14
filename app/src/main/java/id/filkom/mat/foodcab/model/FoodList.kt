@@ -8,6 +8,7 @@ import java.util.ArrayList
  */
 object FoodList {
     val ITEMS:MutableList<Food> = ArrayList<Food>()
+    val ITEMS_FAV:MutableList<Food> = ArrayList<Food>()
     val KATEGORI_ITEMS:MutableList<Kategori> = ArrayList<Kategori>()
     val KATEGORI_ITEMS_TOP:MutableList<Kategori> = ArrayList<Kategori>()
 

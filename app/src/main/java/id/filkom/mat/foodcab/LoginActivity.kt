@@ -44,7 +44,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     /**
      * Keep track of the login task to ensure we can cancel it if requested.
      */
-    private var mAuthTask: UserLoginTask? = null
 
     private var mAuth: FirebaseAuth? = null
 
@@ -132,9 +131,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * errors are presented and no actual login attempt is made.
      */
     private fun attemptLogin() {
-        if (mAuthTask != null) {
-            return
-        }
 
         // Reset errors.
         email.error = null
@@ -173,8 +169,21 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true)
-            mAuthTask = UserLoginTask(emailStr, passwordStr)
-            mAuthTask!!.execute(null as Void?)
+            mAuth?.signInWithEmailAndPassword(emailStr, passwordStr)
+                    ?.addOnCompleteListener(this@LoginActivity,{
+                        if(it.isSuccessful){
+                            Toast.makeText(this@LoginActivity,"Logged In : ${it.result.user.email}",Toast.LENGTH_SHORT).show()
+                            showProgress(false)
+                            var intent = Intent(this@LoginActivity, HomeActivity::class.java)
+                            intent.putExtra("id", mAuth?.currentUser?.email)
+                            startActivity(intent)
+                            finish()
+                        }else{
+                            Toast.makeText(this@LoginActivity,"Error: ${it.exception?.message}",Toast.LENGTH_SHORT).show()
+                            password.error = getString(R.string.error_failed)
+                            password.requestFocus()
+                        }
+                    })
         }
     }
 
@@ -276,46 +285,6 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
      * Represents an asynchronous login/registration task used to authenticate
      * the user.
      */
-    inner class UserLoginTask internal constructor(private val mEmail: String, private val mPassword: String) : AsyncTask<Void, Void, Boolean>() {
-
-        override fun doInBackground(vararg params: Void): Boolean? {
-            // TODO: attempt authentication against a network service.
-
-            try {
-                mAuth?.signInWithEmailAndPassword(mEmail, mPassword)
-                        ?.addOnCompleteListener(this@LoginActivity,{
-                            if(it.isSuccessful){
-                                Toast.makeText(this@LoginActivity,"Logged In : ${it.result.user.email}",Toast.LENGTH_SHORT).show()
-                            }else{
-                                Toast.makeText(this@LoginActivity,"Error: ${it.exception?.message}",Toast.LENGTH_SHORT).show()
-                            }
-                        })
-            } catch (e: InterruptedException) {
-                return false
-            }
-            return mAuth?.currentUser!=null
-        }
-
-        override fun onPostExecute(success: Boolean?) {
-            mAuthTask = null
-            showProgress(false)
-            if (success!!) {
-                var intent = Intent(this@LoginActivity, HomeActivity::class.java)
-                intent.putExtra("id", mAuth?.currentUser?.email)
-                startActivity(intent)
-                finish()
-            } else {
-                password.error = getString(R.string.error_failed)
-                password.requestFocus()
-            }
-        }
-
-        override fun onCancelled() {
-            mAuthTask = null
-            showProgress(false)
-        }
-    }
-
     companion object {
 
         /**

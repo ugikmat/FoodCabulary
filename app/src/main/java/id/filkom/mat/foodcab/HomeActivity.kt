@@ -25,10 +25,19 @@ import android.app.SearchManager
 import android.content.Context
 import android.support.v7.widget.Toolbar
 import android.widget.SearchView
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
 import id.filkom.mat.foodcab.model.Kategori
+import id.filkom.mat.foodcab.model.User
+import id.filkom.mat.foodcab.model.Users
 
 
 class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, BottomNavigationView.OnNavigationItemSelectedListener {
+
+    private var mAuth: FirebaseAuth? = null
+    val database = FirebaseDatabase.getInstance()
+    val myRef = database.getReference("users")
+
     override fun onListFragmentInteraction(item: Kategori) {
 
     }
@@ -49,6 +58,9 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
         setContentView(R.layout.activity_home)
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
+
+        mAuth = FirebaseAuth.getInstance();
+
         initBottomNavigation()
 
         fab_add.setOnClickListener {
@@ -121,8 +133,18 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
 
     override fun onListFragmentInteraction(item: Food) {
-        Log.d("INFOOOOOOOOO","Clicked")
-        Toast.makeText(this,"Clicked ${item.name}",Toast.LENGTH_SHORT ).show()
+        if(!Users.user?.fav?.isEmpty()!!){
+            Users.user.fav.forEach {
+                if(it.name?.equals(item?.name,true)!!
+                        &&it.seller?.equals(item?.seller,true)!!){
+                    Toast.makeText(this,"Already Added",Toast.LENGTH_SHORT ).show()
+                    return
+                }
+            }
+        }
+        Users.user.fav.add(item)
+        myRef.child(mAuth?.uid).setValue(Users.user)
+        Toast.makeText(this,"Added to Fav",Toast.LENGTH_SHORT ).show()
     }
 
     override fun onFragmentInteraction(uri: Uri) {

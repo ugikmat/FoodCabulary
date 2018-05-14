@@ -101,6 +101,20 @@ class HomeFragment : Fragment() {
      * See the Android Training lesson [Communicating with Other Fragments](http://developer.android.com/training/basics/fragments/communicating.html) for more information.
      */
 
+    override fun onAttach(context: Context?) {
+        super.onAttach(context)
+        if (context is OnListFragmentInteractionListener) {
+            mListener = context
+        } else {
+            throw RuntimeException(context!!.toString() + " must implement OnListFragmentInteractionListener")
+        }
+    }
+
+    override fun onDetach() {
+        super.onDetach()
+        mListener = null
+    }
+
     companion object {
 
         val TAG: String = HomeFragment::class.java.simpleName
