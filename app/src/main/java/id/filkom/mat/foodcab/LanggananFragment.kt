@@ -39,18 +39,20 @@ class LanggananFragment : Fragment() {
 
     private var mAuth: FirebaseAuth? = null
 
+    public lateinit var adapter:RecyclerView.Adapter<MyFoodRecyclerViewAdapter.ViewHolder>
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        FoodList.ITEMS_FAV.clear()
         mAuth = FirebaseAuth.getInstance();
-        loadMenu()
+        adapter = MyFoodRecyclerViewAdapter("fav",activity?.baseContext,FoodList.ITEMS_FAV, mListener)
 
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
                               savedInstanceState: Bundle?): View? {
         val view = inflater.inflate(R.layout.fragment_langganan_list, container, false)
-
+        Log.d("INFOOOOOOOOOOOOOOOOOOO", FoodList.ITEMS_FAV.toString())
+        Log.d("INFOOOOOOOOOOOOOOOOOOO", FoodList.ITEMS.toString())
         // Set the adapter
         if (view is RecyclerView) {
             val context = view.getContext()
@@ -60,39 +62,14 @@ class LanggananFragment : Fragment() {
             } else {
                 recyclerView.layoutManager = GridLayoutManager(context, mColumnCount)
             }
-            recyclerView.adapter = MyFoodRecyclerViewAdapter(activity?.baseContext,FoodList.ITEMS_FAV, mListener)
+            recyclerView.adapter = adapter
         }
         return view
     }
 
-    private fun loadMenu() {
-        var database = FirebaseDatabase.getInstance()
-        val myRef = database.getReference("users/"+mAuth?.currentUser?.uid+"/fav")
-
-        // Read from the database
-        myRef.addChildEventListener(object : ChildEventListener {
-            override fun onCancelled(p0: DatabaseError?) {
-
-            }
-
-            override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
-
-            }
-
-            override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
-
-            }
-
-            override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
-                FoodList.ITEMS_FAV.add(p0?.getValue(Food::class.java)!!)
-            }
-
-            override fun onChildRemoved(p0: DataSnapshot?) {
-
-            }
-
-        })
-
+    override fun onResume() {
+        super.onResume()
+        adapter.notifyDataSetChanged()
     }
 
     override fun onAttach(context: Context?) {

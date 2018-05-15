@@ -21,7 +21,7 @@ import id.filkom.mat.foodcab.model.Food
  * specified [OnListFragmentInteractionListener].
  * TODO: Replace the implementation with code for your data type.
  */
-class MyFoodRecyclerViewAdapter(private val context:Context?,private val mValues: List<Food>, private val mListener: OnListFragmentInteractionListener?) : RecyclerView.Adapter<MyFoodRecyclerViewAdapter.ViewHolder>() {
+class MyFoodRecyclerViewAdapter(private val who:String?,private val context:Context?,private val mValues: List<Food>, private val mListener: OnListFragmentInteractionListener?) : RecyclerView.Adapter<MyFoodRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -37,7 +37,7 @@ class MyFoodRecyclerViewAdapter(private val context:Context?,private val mValues
         Picasso.with(context).load(mValues[position].image)
                 .into(holder.mImage)
         holder.mView.setOnClickListener {
-            mListener?.onListFragmentInteraction(position)
+            mListener?.onListFragmentInteraction(position,who!!)
         }
     }
 

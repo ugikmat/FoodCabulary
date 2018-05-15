@@ -25,6 +25,9 @@ import android.content.Context
 import android.support.v7.widget.Toolbar
 import android.widget.SearchView
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.ChildEventListener
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
 import com.google.firebase.database.FirebaseDatabase
 import id.filkom.mat.foodcab.model.*
 
@@ -32,8 +35,7 @@ import id.filkom.mat.foodcab.model.*
 class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, BottomNavigationView.OnNavigationItemSelectedListener {
 
     private var mAuth: FirebaseAuth? = null
-    val database = FirebaseDatabase.getInstance()
-    val myRef = database.getReference("users")
+
 
     override fun onListFragmentInteraction(item: Kategori) {
 
@@ -53,19 +55,50 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
         super.onCreate(savedInstanceState)
         restoreSaveInstanceState(savedInstanceState)
         setContentView(R.layout.activity_home)
+        FoodList.ITEMS_FAV.clear()
         toolbar = findViewById(R.id.toolbar)
         setSupportActionBar(toolbar)
 
-        mAuth = FirebaseAuth.getInstance();
+        mAuth = FirebaseAuth.getInstance()
 
         initBottomNavigation()
-
         fab_add.setOnClickListener {
             startActivity(Intent(this,AddActivity::class.java))
         }
 
         initBottomNavigation()
         initFragment(savedInstanceState)
+        loadMenu()
+    }
+
+    private fun loadMenu() {
+        val database = FirebaseDatabase.getInstance()
+        val myRef = database.getReference("users/"+mAuth?.currentUser?.uid+"/fav")
+        Log.d("INFOOOOOOOOOOOOOO",myRef.toString())
+        // Read from the database
+        myRef.addChildEventListener(object : ChildEventListener {
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
+                FoodList.ITEMS_FAV.add(p0?.getValue(Food::class.java)!!)
+                FoodList.ITEM_FAV_MAP.put(FoodList.ITEMS_FAV.size-1,p0?.getValue(Food::class.java)!!)
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot?) {
+
+            }
+
+        })
     }
 
     private fun restoreSaveInstanceState(savedInstanceState: Bundle?) {
@@ -129,11 +162,10 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
     }
 
 
-    override fun onListFragmentInteraction(index: Int) {
-
-
+    override fun onListFragmentInteraction(index: Int, who:String) {
         val intent = Intent(this, FoodDetailActivity::class.java).apply {
             putExtra(FoodDetailFragment.ARG_ITEM_ID, index)
+            putExtra("who", who)
         }
         startActivity(intent)
 

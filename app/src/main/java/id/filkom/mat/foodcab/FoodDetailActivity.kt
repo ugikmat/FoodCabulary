@@ -1,5 +1,6 @@
 package id.filkom.mat.foodcab
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.design.widget.Snackbar
@@ -8,6 +9,15 @@ import android.view.MenuItem
 import com.squareup.picasso.Picasso
 import id.filkom.mat.foodcab.model.FoodList
 import kotlinx.android.synthetic.main.activity_food_detail.*
+import android.content.Context.MODE_PRIVATE
+import android.content.SharedPreferences
+import android.net.http.SslCertificate.saveState
+import android.widget.Toast
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.FirebaseDatabase
+import id.filkom.mat.foodcab.model.Food
+import id.filkom.mat.foodcab.model.Users
+
 
 /**
  * An activity representing a single Food detail screen. This
@@ -17,17 +27,37 @@ import kotlinx.android.synthetic.main.activity_food_detail.*
  */
 class FoodDetailActivity : AppCompatActivity() {
 
+    private var mAuth: FirebaseAuth? = null
+    val database = FirebaseDatabase.getInstance()
+    val myRef = database.getReference("users")
+
+    var detail: Food? = null
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_food_detail)
         setSupportActionBar(detail_toolbar)
-
-        Picasso.with(this).load(FoodList.ITEM_MAP[intent.getIntExtra(FoodDetailFragment.ARG_ITEM_ID,0)]?.image)
+        mAuth = FirebaseAuth.getInstance()
+        if(intent.getStringExtra("who").equals("home",true)){
+            detail = FoodList.ITEM_MAP[intent.getIntExtra(FoodDetailFragment.ARG_ITEM_ID,0)]!!
+        }else if(intent.getStringExtra("who").equals("fav",true)){
+            detail = FoodList.ITEMS_FAV[intent.getIntExtra(FoodDetailFragment.ARG_ITEM_ID,0)]!!
+        }
+        Picasso.with(this).load(detail?.image)
                 .into(menu_image)
 
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own detail action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
+        fab.setOnClickListener {
+            var isFavourite = readState()
+
+            if (isFavourite) {
+                isFavourite = false
+                saveState(isFavourite)
+
+            } else {
+                isFavourite = true
+                saveState(isFavourite)
+
+            }
+            saveFavorite()
         }
 
         // Show the Up button in the action bar.
@@ -56,6 +86,63 @@ class FoodDetailActivity : AppCompatActivity() {
                     .add(R.id.food_detail_container, fragment)
                     .commit()
         }
+        loadFavorite()
+    }
+
+    private fun saveState(isFavourite: Boolean) {
+        val aSharedPreferences = this.getSharedPreferences(
+                "Favourite", Context.MODE_PRIVATE)
+        val aSharedPreferencesEdit = aSharedPreferences
+                .edit()
+        aSharedPreferencesEdit.putBoolean("State", isFavourite)
+        aSharedPreferencesEdit.commit()
+        if(isFavourite)fab.setImageResource(R.drawable.ic_favorite_red_300_24dp)
+        else fab.setImageResource(R.drawable.ic_favorite_white_24dp)
+    }
+
+    private fun readState(): Boolean {
+        val aSharedPreferences = this.getSharedPreferences(
+                "Favourite", Context.MODE_PRIVATE)
+        if(!aSharedPreferences.contains("State")){
+
+        }
+
+        return aSharedPreferences.getBoolean("State", true)
+    }
+
+    private fun loadFavorite(){
+        if(!Users.user?.fav?.isEmpty()!!){
+            Users.user!!.fav.forEach {
+                if(it.id==detail?.id){
+                    saveState(true)
+                    return
+                }
+            }
+        }
+        saveState(false)
+    }
+
+    private fun saveFavorite(){
+        if(!Users.user?.fav?.isEmpty()!!){
+            Users.user!!.fav.forEach {
+                if(it.id==detail?.id){
+                    Users.user!!.fav.remove(it)
+                    FoodList.ITEMS_FAV.remove(detail)
+                    myRef.child(mAuth?.uid).setValue(Users.user).addOnCompleteListener {
+                        if(it.isSuccessful)Toast.makeText(this,"SUCCESS",Toast.LENGTH_SHORT).show()
+                        else if(it.isSuccessful)Toast.makeText(this,"FAILED",Toast.LENGTH_SHORT).show()
+                    }
+                    Toast.makeText(this,"Removed from Fav",Toast.LENGTH_SHORT ).show()
+                    return
+                }
+            }
+        }
+        Users.user!!.fav.add(detail!!)
+        myRef.child(mAuth?.uid).setValue(Users.user).addOnCompleteListener {
+            if(it.isSuccessful)Toast.makeText(this,"SUCCESS",Toast.LENGTH_SHORT).show()
+            else if(it.isSuccessful)Toast.makeText(this,"FAILED",Toast.LENGTH_SHORT).show()
+        }
+        Toast.makeText(this,"Added to Fav",Toast.LENGTH_SHORT ).show()
     }
 
 //    override fun onOptionsItemSelected(item: MenuItem) =

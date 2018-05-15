@@ -35,6 +35,13 @@ import com.google.firebase.auth.AuthResult
 import kotlinx.android.synthetic.main.activity_login.*
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.database.DataSnapshot
+import com.google.firebase.database.DatabaseError
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.database.ValueEventListener
+import id.filkom.mat.foodcab.model.Food
+import id.filkom.mat.foodcab.model.User
+import id.filkom.mat.foodcab.model.Users
 
 
 /**
@@ -47,9 +54,11 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     private var mAuth: FirebaseAuth? = null
 
+    val database = FirebaseDatabase.getInstance()
+    val myRef = database.getReference("users")
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("INFOOOOOOOOOOOOO","OnCreate")
         setContentView(R.layout.activity_login)
         // Set up the login form.
         mAuth = FirebaseAuth.getInstance();
@@ -77,11 +86,19 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
 
     public override fun onStart() {
         super.onStart()
-        Log.d("INFOOOOOOOOOOOOO","OnStart")
         // Check if user is signed in (non-null) and update UI accordingly.
         val currentUser = mAuth?.getCurrentUser()
-
         if(currentUser!=null){
+            myRef.child(mAuth?.uid).addListenerForSingleValueEvent(object:ValueEventListener{
+                override fun onCancelled(p0: DatabaseError?) {
+
+                }
+
+                override fun onDataChange(p0: DataSnapshot?) {
+                    Users.user = p0?.getValue(User::class.java)!!
+                }
+
+            })
             startActivity(Intent(this@LoginActivity,HomeActivity::class.java))
             finish()
         }
@@ -176,6 +193,16 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
                             showProgress(false)
                             var intent = Intent(this@LoginActivity, HomeActivity::class.java)
                             intent.putExtra("id", mAuth?.currentUser?.email)
+                            myRef.child(mAuth?.uid).addListenerForSingleValueEvent(object:ValueEventListener{
+                                override fun onCancelled(p0: DatabaseError?) {
+
+                                }
+
+                                override fun onDataChange(p0: DataSnapshot?) {
+                                    Users.user = p0?.getValue(User::class.java)!!
+                                }
+
+                            })
                             startActivity(intent)
                             finish()
                         }else{

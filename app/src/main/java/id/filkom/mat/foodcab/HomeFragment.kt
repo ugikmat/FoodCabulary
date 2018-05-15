@@ -37,12 +37,11 @@ import java.util.*
 class HomeFragment : Fragment() {
     private var mColumnCount = 1
     private var mListener: OnListFragmentInteractionListener? = null
-
+    public lateinit var adapter:RecyclerView.Adapter<MyFoodRecyclerViewAdapter.ViewHolder>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        Log.d("create","OnCreate")
-        FoodList.ITEMS.clear()
+
         loadMenu()
     }
 
@@ -57,7 +56,8 @@ class HomeFragment : Fragment() {
             } else {
                 view.layoutManager = GridLayoutManager(context, mColumnCount)
             }
-            view.adapter = MyFoodRecyclerViewAdapter(activity?.baseContext,FoodList.ITEMS, mListener)
+            adapter = MyFoodRecyclerViewAdapter("home",activity?.baseContext,FoodList.ITEMS, mListener)
+            view.adapter = adapter
         }
 
         return view
@@ -84,7 +84,7 @@ class HomeFragment : Fragment() {
             override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
                 FoodList.ITEMS.add(p0?.getValue(Food::class.java)!!)
                 FoodList.ITEM_MAP.put(FoodList.ITEMS.size-1,p0?.getValue(Food::class.java)!!)
-                list.adapter.notifyItemInserted(FoodList.ITEMS.size-1)
+                adapter.notifyItemInserted(FoodList.ITEMS.size-1)
 
             }
 
@@ -109,7 +109,7 @@ class HomeFragment : Fragment() {
         if (context is OnListFragmentInteractionListener) {
             mListener = context
         } else {
-            throw RuntimeException(context!!.toString() + " must implement OnListFragmentInteractionListener")
+            throw RuntimeException(context!!.toString() + " must implement OnListFragmentInteractionListener") as Throwable
         }
     }
 

@@ -79,6 +79,7 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
                         val downloadUrl = taskSnapshot.downloadUrl
                         imageFolder?.downloadUrl.addOnSuccessListener {
                             newFood.image=it.toString()
+                            newFood.id=mDatabaseRef?.push()?.key
                             mDatabaseRef?.push()?.setValue(newFood)
                                     ?.addOnSuccessListener {
                                         Toast.makeText(this,"Succes",Toast.LENGTH_SHORT).show()
