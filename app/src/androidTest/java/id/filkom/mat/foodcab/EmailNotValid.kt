@@ -29,6 +29,7 @@ class EmailNotValid {
         onView(withId(R.id.email)).perform(typeText("Halo Semuanya"))
         onView(withId(R.id.password)).perform(typeText("Halo emuanya"))
         onView(withId(R.id.email_sign_in_button)).perform(click())
+        onView(withId(R.id.email)).check(matches(hasErrorText("This email address is invalid")))
         try {
             Thread.sleep(5000)
         } catch (e: InterruptedException) {
@@ -37,15 +38,16 @@ class EmailNotValid {
 
     }
 
+    @Test
     fun emptyEmail() {
         //to check view on screen
         onView(withId(R.id.password)).perform(typeText("Halo emuanya"))
         onView(withId(R.id.email_sign_in_button)).perform(click())
+        onView(withId(R.id.email)).check(matches(hasErrorText("This field is required")))
         try {
             Thread.sleep(5000)
         } catch (e: InterruptedException) {
             e.printStackTrace()
         }
-
     }
 }
