@@ -87,11 +87,15 @@ class LoginActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
     public override fun onStart() {
         super.onStart()
         // Check if user is signed in (non-null) and update UI accordingly.
+        isLoggedIn()
+    }
+
+    private fun isLoggedIn(){
         val currentUser = mAuth?.getCurrentUser()
         if(currentUser!=null){
             myRef.child(mAuth?.uid).addListenerForSingleValueEvent(object:ValueEventListener{
                 override fun onCancelled(p0: DatabaseError?) {
-
+                    Toast.makeText(this@LoginActivity,p0?.message,Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onDataChange(p0: DataSnapshot?) {

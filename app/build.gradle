@@ -10,9 +10,9 @@ android {
     signingConfigs {
         config {
             keyAlias 'key0'
-            keyPassword 'Password4Me'
+            keyPassword ''
             storeFile file('/home/mat/keystore/mat.jks')
-            storePassword 'Password4Me'
+            storePassword ''
         }
     }
     compileSdkVersion 26

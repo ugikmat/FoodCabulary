@@ -83,8 +83,7 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
                             mDatabaseRef?.push()?.setValue(newFood)
                                     ?.addOnSuccessListener {
                                         Toast.makeText(this,"Succes",Toast.LENGTH_SHORT).show()
-                                        startActivity(Intent(this,HomeActivity::class.java))
-                                        this@AddActivity.finish()
+                                        onBackPressed()
                                     }
                                     ?.addOnFailureListener{
                                         Toast.makeText(this,"Failed",Toast.LENGTH_SHORT).show()
@@ -122,8 +121,7 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
 
                     })
                     ?.addOnFailureListener(OnFailureListener {
-                        // Handle unsuccessful uploads
-                        // ...
+
                     })
                     ?.addOnProgressListener {
 
@@ -164,12 +162,6 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
 
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
-        Toast.makeText(this,"Foto Dipilih " +
-                "${requestCode == PICK_IMAGE_REQUEST}" +
-                " ${resultCode == Activity.RESULT_OK}" +
-                "${data !=null}" +
-                "${data?.data != null}", Toast.LENGTH_SHORT).show()
-
         if(requestCode == PICK_IMAGE_REQUEST
                 && resultCode == Activity.RESULT_OK
                 && data !=null && data.data != null){

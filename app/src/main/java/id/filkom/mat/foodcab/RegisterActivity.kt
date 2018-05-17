@@ -135,26 +135,30 @@ class RegisterActivity : AppCompatActivity(), LoaderCallbacks<Cursor> {
             // form field with an error.
             focusView?.requestFocus()
         } else {
-            // Show a progress spinner, and kick off a background task to
-            // perform the user login attempt.
-            showProgress(true)
-
-            mAuth?.createUserWithEmailAndPassword(emailStr, passwordStr)
-                    ?.addOnCompleteListener(this@RegisterActivity, {
-                        if(it.isSuccessful){
-                            Toast.makeText(this@RegisterActivity,"Sign Up Success : ${it.result.user.email}", Toast.LENGTH_SHORT).show()
-                            Users.user?.name =unameStr
-                            myRef.child(mAuth?.uid).setValue(Users.user)
-                            startActivity(Intent(this@RegisterActivity,HomeActivity::class.java))
-                            finish()
-                        }else{
-                            Toast.makeText(this@RegisterActivity,"Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
-                            password.error = getString(R.string.error_failed)
-                            password.requestFocus()
-                        }
-                        showProgress(false)
-                    })
+            Users.user?.name =unameStr
+            createUserWithEmailAndPassword(emailStr,passwordStr)
         }
+    }
+
+    private fun createUserWithEmailAndPassword(mEmail:String, mPassword: String){
+        // Show a progress spinner, and kick off a background task to
+        // perform the user login attempt.
+        showProgress(true)
+
+        mAuth?.createUserWithEmailAndPassword(mEmail, mPassword)
+                ?.addOnCompleteListener(this@RegisterActivity, {
+                    if(it.isSuccessful){
+                        Toast.makeText(this@RegisterActivity,"Sign Up Success : ${it.result.user.email}", Toast.LENGTH_SHORT).show()
+                        myRef.child(mAuth?.uid).setValue(Users.user)
+                        startActivity(Intent(this@RegisterActivity,HomeActivity::class.java))
+                        finish()
+                    }else{
+                        Toast.makeText(this@RegisterActivity,"Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
+                        password.error = getString(R.string.error_failed)
+                        password.requestFocus()
+                    }
+                    showProgress(false)
+                })
     }
 
     private fun isEmailValid(email: String): Boolean {

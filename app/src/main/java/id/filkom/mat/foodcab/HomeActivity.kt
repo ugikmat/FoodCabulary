@@ -74,7 +74,6 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
     private fun loadMenu() {
         val database = FirebaseDatabase.getInstance()
         val myRef = database.getReference("users/"+mAuth?.currentUser?.uid+"/fav")
-        Log.d("INFOOOOOOOOOOOOOO",myRef.toString())
         // Read from the database
         myRef.addChildEventListener(object : ChildEventListener {
             override fun onCancelled(p0: DatabaseError?) {

@@ -48,11 +48,6 @@ class ProfileFragment : Fragment() {
             activity?.finish()
         }
 
-        btn_test_detail.setOnClickListener {
-
-            activity?.startActivity(Intent(activity,MapsActivity::class.java))
-
-        }
 
     }
 
