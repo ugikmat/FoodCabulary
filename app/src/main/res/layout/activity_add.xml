@@ -78,6 +78,30 @@ tools:context="id.filkom.mat.foodcab.AddActivity">
                 android:text="Soto"
                 />
             <RadioButton
+                android:id="@+id/roti"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Roti"
+                />
+            <RadioButton
+                android:id="@+id/mie"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Mie"
+                />
+            <RadioButton
+                android:id="@+id/pecel"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Pecel"
+                />
+            <RadioButton
+                android:id="@+id/ayam"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Ayam"
+                />
+            <RadioButton
                 android:id="@+id/other"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

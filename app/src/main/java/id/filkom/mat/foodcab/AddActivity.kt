@@ -170,6 +170,4 @@ class AddActivity : AppCompatActivity(), View.OnClickListener {
             choose_image_button.text = "Change Image"
         }
     }
-
-
 }

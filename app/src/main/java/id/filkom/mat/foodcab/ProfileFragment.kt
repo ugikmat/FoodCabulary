@@ -9,7 +9,9 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import id.filkom.mat.foodcab.model.Users
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.database.*
 import kotlinx.android.synthetic.main.fragment_profile.*
 
 
@@ -30,6 +32,7 @@ class ProfileFragment : Fragment() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         mAuth = FirebaseAuth.getInstance();
+
     }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?,
@@ -42,6 +45,7 @@ class ProfileFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
         text_email.text = mAuth?.currentUser?.email
         text_uid.text = mAuth?.currentUser?.uid
+        text_uname.text = Users.user?.name
         btn_logout.setOnClickListener {
             mAuth?.signOut()
             activity?.startActivity(Intent(activity,LoginActivity::class.java))

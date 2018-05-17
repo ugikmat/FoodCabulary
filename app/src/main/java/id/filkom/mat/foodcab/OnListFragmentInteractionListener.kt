@@ -10,7 +10,5 @@ import id.filkom.mat.foodcab.model.Kategori
  */
 interface OnListFragmentInteractionListener {
     fun onListFragmentInteraction(index: Int,who:String)
-    fun onFragmentInteraction(uri: Uri)
-    fun onListFragmentInteraction(item: DummyContent.DummyItem)
     fun onListFragmentInteraction(item: Kategori)
 }

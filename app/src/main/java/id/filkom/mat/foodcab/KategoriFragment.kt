@@ -11,7 +11,6 @@ import android.view.View
 import android.view.ViewGroup
 
 import id.filkom.mat.foodcab.model.FoodList
-
 import kotlinx.android.synthetic.main.fragment_kategori_list.*
 
 /**
@@ -56,14 +55,14 @@ class KategoriFragment : Fragment() {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
 
-        recycler_top.layoutManager = LinearLayoutManager(recycler_top.context)
-        recycler_top.adapter = MykategoriRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS_TOP, mListener)
+//        recycler_top.layoutManager = LinearLayoutManager(recycler_top.context)
+//        recycler_top.adapter = MykategoriRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS_TOP, mListener)
 
         recycler_kat.layoutManager = GridLayoutManager(recycler_kat.context,mColumnCount)
         recycler_kat.adapter = MyFoodSortRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS, mListener)
 
         recycler_list.layoutManager = LinearLayoutManager(recycler_list.context)
-        recycler_list.adapter = MykategoriRecyclerViewAdapter(activity?.baseContext,FoodList.KATEGORI_ITEMS_TOP, mListener)
+        recycler_list.adapter = MyFoodRecyclerViewAdapter("home",activity?.baseContext,FoodList.ITEMS, mListener)
     }
 
     override fun onAttach(context: Context?) {

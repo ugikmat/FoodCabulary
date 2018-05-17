@@ -41,6 +41,8 @@ class FoodDetailActivity : AppCompatActivity() {
             detail = FoodList.ITEM_MAP[intent.getIntExtra(FoodDetailFragment.ARG_ITEM_ID,0)]!!
         }else if(intent.getStringExtra("who").equals("fav",true)){
             detail = FoodList.ITEMS_FAV[intent.getIntExtra(FoodDetailFragment.ARG_ITEM_ID,0)]!!
+        }else if(intent.getStringExtra("who").equals("kategori",true)){
+            detail = FoodList.ITEMS_KATEGORI[intent.getIntExtra(FoodDetailFragment.ARG_ITEM_ID,0)]!!
         }
         Picasso.with(this).load(detail?.image)
                 .into(menu_image)
@@ -79,6 +81,8 @@ class FoodDetailActivity : AppCompatActivity() {
                 arguments = Bundle().apply {
                     putInt(FoodDetailFragment.ARG_ITEM_ID,
                             intent.getIntExtra(FoodDetailFragment.ARG_ITEM_ID,0))
+                    putString("who",
+                            intent.getStringExtra("who"))
                 }
             }
 

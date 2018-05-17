@@ -1,16 +1,22 @@
 package id.filkom.mat.foodcab
 
+import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
 import android.support.v7.widget.RecyclerView
 import android.support.design.widget.Snackbar
+import android.support.v4.content.ContextCompat.startActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
 import android.widget.TextView
+import com.squareup.picasso.Picasso
 
 import id.filkom.mat.foodcab.dummy.DummyContent
+import id.filkom.mat.foodcab.model.Food
+import id.filkom.mat.foodcab.model.FoodList
 import kotlinx.android.synthetic.main.activity_food_list.*
 import kotlinx.android.synthetic.main.food_list_content.view.*
 
@@ -30,6 +36,7 @@ class FoodListActivity : AppCompatActivity() {
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
      * device.
      */
+    private var mListener: OnListFragmentInteractionListener? = null
     private var mTwoPane: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -38,11 +45,6 @@ class FoodListActivity : AppCompatActivity() {
 
         setSupportActionBar(toolbar)
         toolbar.title = title
-
-        fab.setOnClickListener { view ->
-            Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                    .setAction("Action", null).show()
-        }
 
         if (food_detail_container != null) {
             // The detail container view will be present only in the
@@ -56,53 +58,53 @@ class FoodListActivity : AppCompatActivity() {
     }
 
     private fun setupRecyclerView(recyclerView: RecyclerView) {
-        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane)
+//        recyclerView.adapter = SimpleItemRecyclerViewAdapter(this, DummyContent.ITEMS, mTwoPane)
+        recyclerView.adapter = SimpleItemRecyclerViewAdapter("kategori",this, FoodList.ITEMS_KATEGORI)
     }
 
-    class SimpleItemRecyclerViewAdapter(private val mParentActivity: FoodListActivity,
-                                        private val mValues: List<DummyContent.DummyItem>,
-                                        private val mTwoPane: Boolean) :
-            RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>() {
+    class SimpleItemRecyclerViewAdapter(private val who:String?,
+                                        private val context: Context?,
+                                        private val mValues: List<Food>)
+        : RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder>()  {
 
-        private val mOnClickListener: View.OnClickListener
-
-        init {
-            mOnClickListener = View.OnClickListener { v ->
-                val item = v.tag as DummyContent.DummyItem
-                if (mTwoPane) {
-                    val fragment = FoodDetailFragment().apply {
-                        arguments = Bundle().apply {
-                            putString(FoodDetailFragment.ARG_ITEM_ID, item.id)
-                        }
-                    }
-                    mParentActivity.supportFragmentManager
-                            .beginTransaction()
-                            .replace(R.id.food_detail_container, fragment)
-                            .commit()
-                } else {
-                    val intent = Intent(v.context, FoodDetailActivity::class.java).apply {
-                        putExtra(FoodDetailFragment.ARG_ITEM_ID, item.id)
-                    }
-                    v.context.startActivity(intent)
-                }
-            }
-        }
+//        private val mOnClickListener: View.OnClickListener
+//
+//        init {
+//            mOnClickListener = View.OnClickListener { v ->
+//                val item = v.tag as Food
+//                val intent = Intent(context, FoodDetailActivity::class.java).apply {
+//                    putExtra(FoodDetailFragment.ARG_ITEM_ID, index)
+//                    putExtra("who", who)
+//                }
+//                context?.startActivity(intent)
+//            }
+//        }
 
         override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
             val view = LayoutInflater.from(parent.context)
-                    .inflate(R.layout.food_list_content, parent, false)
+                    .inflate(R.layout.menu_item, parent, false)
             return ViewHolder(view)
         }
 
         override fun onBindViewHolder(holder: ViewHolder, position: Int) {
             val item = mValues[position]
-            holder.mIdView.text = item.id
-            holder.mContentView.text = item.content
+            holder.mItem = mValues[position]
 
-            with(holder.itemView) {
-                tag = item
-                setOnClickListener(mOnClickListener)
+            holder.mTitle.text = mValues[position].name
+            Picasso.with(context).load(mValues[position].image)
+                    .into(holder.mImage)
+
+            holder.itemView.setOnClickListener {
+                val intent = Intent(context, FoodDetailActivity::class.java).apply {
+                    putExtra(FoodDetailFragment.ARG_ITEM_ID, position)
+                    putExtra("who", who)
+                }
+                context?.startActivity(intent)
             }
+//            with(holder.itemView) {
+//                tag = item
+//                setOnClickListener(mOnClickListener)
+//            }
         }
 
         override fun getItemCount(): Int {
@@ -110,8 +112,14 @@ class FoodListActivity : AppCompatActivity() {
         }
 
         inner class ViewHolder(mView: View) : RecyclerView.ViewHolder(mView) {
-            val mIdView: TextView = mView.id_text
-            val mContentView: TextView = mView.content
+            val mImage: ImageView
+            val mTitle: TextView
+            var mItem: Food? = null
+
+            init {
+                mTitle = mView.findViewById<View>(R.id.menu_name) as TextView
+                mImage = mView.findViewById<View>(R.id.menu_image) as ImageView
+            }
         }
     }
 }

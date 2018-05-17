@@ -8,13 +8,15 @@ import android.widget.TextView
 
 
 import id.filkom.mat.foodcab.dummy.DummyContent.DummyItem
+import id.filkom.mat.foodcab.model.Food
+import id.filkom.mat.foodcab.model.Kategori
 
 /**
  * [RecyclerView.Adapter] that can display a [DummyItem] and makes a call to the
  * specified [OnListFragmentInteractionListener].
  * TODO: Replace the implementation with code for your data type.
  */
-class MyLanggananRecyclerViewAdapter(private val mValues: List<DummyItem>, private val mListener: OnListFragmentInteractionListener?) : RecyclerView.Adapter<MyLanggananRecyclerViewAdapter.ViewHolder>() {
+class MyLanggananRecyclerViewAdapter(private val mValues: List<Kategori>, private val mListener: OnListFragmentInteractionListener?) : RecyclerView.Adapter<MyLanggananRecyclerViewAdapter.ViewHolder>() {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
         val view = LayoutInflater.from(parent.context)
@@ -24,8 +26,8 @@ class MyLanggananRecyclerViewAdapter(private val mValues: List<DummyItem>, priva
 
     override fun onBindViewHolder(holder: ViewHolder, position: Int) {
         holder.mItem = mValues[position]
-        holder.mIdView.text = mValues[position].id
-        holder.mContentView.text = mValues[position].content
+        holder.mIdView.text = mValues[position].name
+        holder.mContentView.text = mValues[position].name
 
         holder.mView.setOnClickListener {
             mListener?.onListFragmentInteraction(holder.mItem!!)
@@ -39,7 +41,7 @@ class MyLanggananRecyclerViewAdapter(private val mValues: List<DummyItem>, priva
     inner class ViewHolder(val mView: View) : RecyclerView.ViewHolder(mView) {
         val mIdView: TextView
         val mContentView: TextView
-        var mItem: DummyItem? = null
+        var mItem: Kategori? = null
 
         init {
             mIdView = mView.findViewById<View>(R.id.id) as TextView

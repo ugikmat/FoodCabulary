@@ -36,20 +36,13 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
     private var mAuth: FirebaseAuth? = null
 
-
-    override fun onListFragmentInteraction(item: Kategori) {
-
-    }
-
-    override fun onListFragmentInteraction(item: DummyContent.DummyItem) {
-
-    }
-
     private val KEY_POSITION = "keyPosition"
 
     private var navPosition: BottomNavigationPosition = BottomNavigationPosition.HOME
 
     private lateinit var toolbar: Toolbar
+
+    val database = FirebaseDatabase.getInstance()
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -72,7 +65,6 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
     }
 
     private fun loadMenu() {
-        val database = FirebaseDatabase.getInstance()
         val myRef = database.getReference("users/"+mAuth?.currentUser?.uid+"/fav")
         // Read from the database
         myRef.addChildEventListener(object : ChildEventListener {
@@ -126,6 +118,13 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         navPosition = findNavigationPositionById(item.itemId)
+        when(navPosition){
+            BottomNavigationPosition.HOME ->toolbar.title = "Recomended For You!"
+            BottomNavigationPosition.KATEGORI ->toolbar.title = "Food For You!"
+            BottomNavigationPosition.LANGGANAN ->toolbar.title = "Your Favorite!"
+            BottomNavigationPosition.PROFILE ->toolbar.title = "Your Profile!"
+
+        }
         return switchFragment(navPosition)
     }
 
@@ -182,20 +181,53 @@ class HomeActivity : AppCompatActivity(), OnListFragmentInteractionListener, Bot
 //        Toast.makeText(this,"Added to Fav",Toast.LENGTH_SHORT ).show()
     }
 
-    override fun onFragmentInteraction(uri: Uri) {
+    override fun onListFragmentInteraction(item: Kategori) {
+        val myRef = database.getReference("food")
+        // TODO: Search for food by category
+        FoodList.ITEMS_KATEGORI.clear()
+        FoodList.ITEM_KATEGORI_MAP.clear()
+        myRef.addChildEventListener(object : ChildEventListener{
+            override fun onCancelled(p0: DatabaseError?) {
+
+            }
+
+            override fun onChildMoved(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildChanged(p0: DataSnapshot?, p1: String?) {
+
+            }
+
+            override fun onChildAdded(p0: DataSnapshot?, p1: String?) {
+                if(p0?.getValue(Food::class.java)?.category==item.name){
+                    FoodList.ITEMS_KATEGORI.add(p0?.getValue(Food::class.java)!!)
+                    FoodList.ITEM_KATEGORI_MAP.put(FoodList.ITEMS.size-1,p0?.getValue(Food::class.java)!!)
+                }
+
+            }
+
+            override fun onChildRemoved(p0: DataSnapshot?) {
+
+            }
+
+        })
+        var intent = Intent(this,FoodListActivity::class.java)
+        //TODO: pass a context
+        startActivity(intent)
 
     }
 
-    override fun onCreateOptionsMenu(menu: Menu): Boolean {
-        val inflater = menuInflater
-        inflater.inflate(R.menu.options_menu, menu)
-
-        // Associate searchable configuration with the SearchView
-        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
-        val searchView = menu.findItem(R.id.search).actionView as SearchView
-        searchView.setSearchableInfo(
-                searchManager.getSearchableInfo(componentName))
-
-        return true
-    }
+//    override fun onCreateOptionsMenu(menu: Menu): Boolean {
+//        val inflater = menuInflater
+//        inflater.inflate(R.menu.options_menu, menu)
+//
+//        // Associate searchable configuration with the SearchView
+//        val searchManager = getSystemService(Context.SEARCH_SERVICE) as SearchManager
+//        val searchView = menu.findItem(R.id.search).actionView as SearchView
+//        searchView.setSearchableInfo(
+//                searchManager.getSearchableInfo(componentName))
+//
+//        return true
+//    }
 }

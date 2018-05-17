@@ -5,7 +5,6 @@
     android:layout_height="match_parent"
     tools:context="id.filkom.mat.foodcab.FoodDetailFragment" >
 
-
     <TextView
         android:id="@+id/food_detail"
         style="?android:attr/textAppearanceLarge"
@@ -14,6 +13,23 @@
         android:padding="16dp"
         android:textIsSelectable="true"
         app:layout_constraintTop_toTopOf="parent"/>
+    <TextView
+        android:id="@+id/food_seller"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:textIsSelectable="true"
+        app:layout_constraintTop_toBottomOf="@id/food_detail"/>
+
+    <TextView
+        android:id="@+id/food_phone"
+        style="?android:attr/textAppearanceLarge"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="16dp"
+        android:textIsSelectable="true"
+        app:layout_constraintTop_toBottomOf="@id/food_seller"/>
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/comment_container"
@@ -21,7 +37,7 @@
         android:layout_height="wrap_content"
         app:layout_constraintLeft_toLeftOf="parent"
         app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/food_detail">
+        app:layout_constraintTop_toBottomOf="@id/food_phone">
 
     </android.support.v7.widget.RecyclerView>
 
